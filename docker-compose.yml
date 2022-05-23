@@ -4,10 +4,10 @@ services:
   db:
     image: mysql:latest
     ports:
-      - 3306:3306
+      - 33018:3306
     restart: always
     env_file:
-      - .env
+      - db.env
     volumes:
       - db_data:/var/lib/mysql
     platform: linux/x86_64
