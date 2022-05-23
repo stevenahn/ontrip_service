@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  db:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+    platform: linux/x86_64
+  
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    restart: always
+    volumes:
+      - redis_data:/data
+
+volumes:
+  db_data:
+  redis_data:

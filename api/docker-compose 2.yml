@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: node:16.14-alpine
+    ports:
+      - 3001:3001
+    env_file:
+      - dev.env
+    volumes:
+      - .:/app
+      - api_node_modules:/app/node_modules
+    working_dir: /app
+    restart: always
+    depends_on:
+      - db
+      - redis
+    command: >
+      bash -c "./wait-for-it.sh $$DB_URL:$$DB_PORT --strict -- yarn ready
+
+        if [ $$DEBUGGER == 'true' ]; then
+          yarn server:debugger
+        else
+          yarn server:dev
+        fi
+      "
+
+  db:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/data:/var/lib/mysql
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    restart: always
+    volumes:
+      - redis_data:/data
+
+volumes:
+  db_data:
+  api_node_modules:
+  redis_data:
